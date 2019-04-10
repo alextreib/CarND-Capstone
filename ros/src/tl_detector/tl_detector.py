@@ -81,6 +81,8 @@ class TLDetector(object):
         of times till we start using it. Otherwise the previous stable state is
         used.
         '''
+        rospy.logwarn("State {0} \n".format(state))
+            
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -116,14 +118,15 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        if(not self.has_image):
-            self.prev_light_loc = None
-            return False
+        return light.state
+        # if(not self.has_image):
+        #     self.prev_light_loc = None
+        #     return False
 
-        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
-        # Get classification
-        return self.light_classifier.get_classification(cv_image)
+        # # Get classification
+        # return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
