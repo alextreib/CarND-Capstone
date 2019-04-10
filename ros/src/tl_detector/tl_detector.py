@@ -10,6 +10,7 @@ from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
 import yaml
+import sys
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -59,6 +60,7 @@ class TLDetector(object):
 
     def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
+        # self.waypoint_tree = KDTree(self.waypoints)
 
     def traffic_cb(self, msg):
         self.lights = msg.lights
@@ -95,6 +97,20 @@ class TLDetector(object):
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
 
+    def distance2(self, pose1, pose2):
+        """Calculate the square of the Eucleadian distance bentween the two poses given
+
+        Args:
+            pose1: given Pose
+            pose2: given Pose
+
+        Returns:
+            float: square of the Eucleadian distance bentween the two poses given
+
+        """
+        dist2 = (pose1.position.x-pose2.position.x)**2 + (pose1.position.y-pose2.position.y)**2
+        return dist2
+
     def get_closest_waypoint(self, pose):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
@@ -105,10 +121,25 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        if self.waypoint_tree:
-            closest_idx = self.waypoint_tree.query([x, y], 1)[1]
-            return closest_idx
-        return 0
+        if self.waypoints is None:
+            return None
+
+        dist_min = sys.maxsize
+        wp_min = None
+
+        for wp in range(len(self.waypoints.waypoints)):
+            dist = self.distance2(pose, self.waypoints.waypoints[wp].pose.pose)
+
+            if dist < dist_min:
+                dist_min = dist
+                wp_min = wp
+
+        return wp_min
+        # if self.waypoint_tree:
+        #     closest_idx = self.waypoint_tree.query([x, y], 1)[1]
+        #     return closest_idx
+        # return 0
+
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
