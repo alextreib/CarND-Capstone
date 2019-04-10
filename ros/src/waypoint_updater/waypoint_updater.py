@@ -34,8 +34,8 @@ class WaypointUpdater(object):
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
-        rospy.Subscriber('/traffic_waypoint', WayPoint, self.traffic_cb)
-        rospy.Subscriber('/obstacle_waypoint', Obstacle, self.obstacle_cb)
+        rospy.Subscriber('/traffic_waypoint', Waypoint, self.traffic_cb)
+        # rospy.Subscriber('/obstacle_waypoint', Obstacle, self.obstacle_cb)
 
         self.final_waypoints_pub = rospy.Publisher(
             'final_waypoints', Lane, queue_size=1)
@@ -63,7 +63,7 @@ class WaypointUpdater(object):
     def get_closest_waypoint_id(self):
         x = self.pose.pose.position.x
         y = self.pose.pose.position.y
-        closest_idx = self.waypoint_tree.quer([x, y], 1)[1]
+        closest_idx = self.waypoint_tree.query([x, y], 1)[1]
 
         # Check if closest is ahead or behind vehicle
         closest_coord = self.waypoints_2d[closest_idx]
