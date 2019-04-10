@@ -82,7 +82,7 @@ class TLDetector(object):
         used.
         '''
         rospy.logwarn("State {0} \n".format(state))
-            
+
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -105,8 +105,10 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        closest_idx = self.waypoint_tree.query([x, y], 1)[1]
-        return closest_idx
+        if self.waypoint_tree:
+            closest_idx = self.waypoint_tree.query([x, y], 1)[1]
+            return closest_idx
+        return 0
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
