@@ -88,8 +88,11 @@ class TLDetector(object):
         of times till we start using it. Otherwise the previous stable state is
         used.
         '''
-        rospy.logwarn("State {0} \n".format(state))
-
+        if(self.log_counter>10):
+            rospy.logwarn("State {0} \n".format(state))
+        else:
+            self.log_counter+=1
+        
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -201,7 +204,6 @@ class TLDetector(object):
 
         if closest_light:
             state = self.get_light_state(closest_light)
-            rospy.logwarn("Closest state {0} \n".format(state))
             return line_wp_idx, state
 
         # self.waypoints = None
