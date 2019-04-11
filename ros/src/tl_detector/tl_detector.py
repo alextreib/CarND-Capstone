@@ -154,7 +154,7 @@ class TLDetector(object):
             light (TrafficLight): light to classify
 
         Returns:
-            int: ID of traffic light color (specified in styx_msgs/TrafficLight)
+            int: ID of traffic light color (specified in styx_msgs/TrafficLight) 0=Red
 
         """
         return light.state
@@ -201,6 +201,7 @@ class TLDetector(object):
 
         if closest_light:
             state = self.get_light_state(closest_light)
+            rospy.logwarn("Closest state {0} \n".format(state))
             return line_wp_idx, state
 
         # self.waypoints = None
