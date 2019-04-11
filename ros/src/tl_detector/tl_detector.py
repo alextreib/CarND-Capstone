@@ -60,7 +60,9 @@ class TLDetector(object):
 
     def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
-        # self.waypoint_tree = KDTree(self.waypoints)
+        if not self.waypoints_2d:
+            self.waypoints_2d=[[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoint]
+            self.waypoint_tree=KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
         self.lights = msg.lights
@@ -111,7 +113,7 @@ class TLDetector(object):
         dist2 = (pose1.position.x-pose2.position.x)**2 + (pose1.position.y-pose2.position.y)**2
         return dist2
 
-    def get_closest_waypoint(self, pose):
+    def get_closest_waypoint(self, x,y ):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
         Args:
@@ -121,24 +123,26 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        if self.waypoints is None:
-            return None
+        # if self.waypoints is None:
+        #     return None
 
-        dist_min = sys.maxsize
-        wp_min = None
+        # dist_min = sys.maxsize
+        # wp_min = None
 
-        for wp in range(len(self.waypoints.waypoints)):
-            dist = self.distance2(pose, self.waypoints.waypoints[wp].pose.pose)
+        # for wp in range(len(self.waypoints.waypoints)):
+        #     dist = self.distance2(pose, self.waypoints.waypoints[wp].pose.pose)
 
-            if dist < dist_min:
-                dist_min = dist
-                wp_min = wp
+        #     if dist < dist_min:
+        #         dist_min = dist
+        #         wp_min = wp
 
-        return wp_min
+        # return wp_min
         # if self.waypoint_tree:
         #     closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         #     return closest_idx
         # return 0
+        closest_idx=self.waypoint_tree.query([x,y],1)[1]
+        return closest_idx
 
 
     def get_light_state(self, light):
@@ -178,7 +182,7 @@ class TLDetector(object):
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
         if(self.pose):
-            car_position = self.get_closest_waypoint(self.pose.pose)
+            car_position = self.get_closest_waypoint(self.pose.pose.position.x,self.pose.pose.position.y)
 
             diff = len(self.waypoints.waypoints)
             for i, light in enumerate(self.lights):
