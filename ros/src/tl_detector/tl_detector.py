@@ -11,6 +11,7 @@ import tf
 import cv2
 import yaml
 import sys
+from scipy.spatial import KDTree
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -143,8 +144,7 @@ class TLDetector(object):
         #     closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         #     return closest_idx
         # return 0
-        closest_idx=self.waypoint_tree.query([x,y],1)[1]
-        return closest_idx
+        return self.waypoint_tree.query([x,y],1)[1] 
 
 
     def get_light_state(self, light):
