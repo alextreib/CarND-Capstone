@@ -58,26 +58,24 @@ class WaypointUpdater(object):
             rate.sleep()
 
     def get_closest_waypoint_id(self):
-        if self.waypoint_tree:
-            x = self.pose.pose.position.x
-            y = self.pose.pose.position.y
-            closest_idx = self.waypoint_tree.query([x, y], 1)[1]
+        x = self.pose.pose.position.x
+        y = self.pose.pose.position.y
+        closest_idx = self.waypoint_tree.query([x, y], 1)[1]
 
-            # Check if closest is ahead or behind vehicle
-            closest_coord = self.waypoints_2d[closest_idx]
-            prev_coord = self.waypoints_2d[closest_idx-1]
+        # Check if closest is ahead or behind vehicle
+        closest_coord = self.waypoints_2d[closest_idx]
+        prev_coord = self.waypoints_2d[closest_idx-1]
 
-            # Equation for hyperplan through closest coords
-            cl_vect = np.array(closest_coord)
-            prev_vect = np.array(prev_coord)
-            pos_vect = np.array([x, y])
+        # Equation for hyperplan through closest coords
+        cl_vect = np.array(closest_coord)
+        prev_vect = np.array(prev_coord)
+        pos_vect = np.array([x, y])
 
-            val = np.dot(cl_vect-prev_vect, pos_vect-cl_vect)
+        val = np.dot(cl_vect-prev_vect, pos_vect-cl_vect)
 
-            if val > 0:
-                closest_idx = (closest_idx+1) % len(self.waypoints_2d)
-            return closest_idx
-        return 0
+        if val > 0:
+            closest_idx = (closest_idx+1) % len(self.waypoints_2d)
+        return closest_idx
 
     def publish_waypoints(self):
         final_lane = self.generate_lane()
