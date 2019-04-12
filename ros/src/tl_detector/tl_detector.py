@@ -80,13 +80,12 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
-        if self.img_counter<=100:
-            self.img_counter+=1
+          self.img_counter += 1
+
+        if self.img_counter < 5:
             return
-        # Is exactly 2
-        else:
-            self.img_counter=0
-        return
+        
+        self.img_counter = 0
 
         self.has_image = True
         self.camera_image = msg
