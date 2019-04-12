@@ -148,10 +148,7 @@ class TLDetector(object):
         #     closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         #     return closest_idx
         # return 0
-        if self.waypoint_tree:
-            return self.waypoint_tree.query([x, y], 1)[1]
-        else:
-            return -1
+        return self.waypoint_tree.query([x,y],1)[1] 
 
 
     def get_light_state(self, light):
