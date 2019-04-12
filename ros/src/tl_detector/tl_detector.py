@@ -26,8 +26,8 @@ class TLDetector(object):
         self.waypoint_tree = None
         self.camera_image = None
         self.lights = []
-        self.log_counter=0
-        self.img_counter=0
+        self.log_counter = 0
+        self.img_counter = 0
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -66,8 +66,9 @@ class TLDetector(object):
     def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
         if not self.waypoints_2d:
-            self.waypoints_2d=[[waypoint.pose.pose.position.x,waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
-            self.waypoint_tree=KDTree(self.waypoints_2d)
+            self.waypoints_2d = [[waypoint.pose.pose.position.x,
+                                  waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
+            self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
         self.lights = msg.lights
@@ -80,11 +81,11 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
-          self.img_counter += 1
+        self.img_counter += 1
 
         if self.img_counter < 5:
             return
-        
+
         self.img_counter = 0
 
         self.has_image = True
@@ -97,11 +98,11 @@ class TLDetector(object):
         of times till we start using it. Otherwise the previous stable state is
         used.
         '''
-        if(self.log_counter>10):
+        if(self.log_counter > 10):
             rospy.logwarn("State {0} \n".format(state))
         else:
-            self.log_counter+=1
-        
+            self.log_counter += 1
+
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -125,10 +126,11 @@ class TLDetector(object):
             float: square of the Eucleadian distance bentween the two poses given
 
         """
-        dist2 = (pose1.position.x-pose2.position.x)**2 + (pose1.position.y-pose2.position.y)**2
+        dist2 = (pose1.position.x-pose2.position.x)**2 + \
+            (pose1.position.y-pose2.position.y)**2
         return dist2
 
-    def get_closest_waypoint(self, x,y ):
+    def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
         Args:
@@ -156,8 +158,7 @@ class TLDetector(object):
         #     closest_idx = self.waypoint_tree.query([x, y], 1)[1]
         #     return closest_idx
         # return 0
-        return self.waypoint_tree.query([x,y],1)[1] 
-
+        return self.waypoint_tree.query([x, y], 1)[1]
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
@@ -196,7 +197,8 @@ class TLDetector(object):
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
         if(self.pose):
-            car_position = self.get_closest_waypoint(self.pose.pose.position.x,self.pose.pose.position.y)
+            car_position = self.get_closest_waypoint(
+                self.pose.pose.position.x, self.pose.pose.position.y)
 
             diff = len(self.waypoints.waypoints)
             for i, light in enumerate(self.lights):
@@ -217,6 +219,7 @@ class TLDetector(object):
 
         # self.waypoints = None
         return -1, TrafficLight.UNKNOWN
+
 
 if __name__ == '__main__':
     try:
