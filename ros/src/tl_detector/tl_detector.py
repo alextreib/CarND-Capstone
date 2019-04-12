@@ -62,6 +62,7 @@ class TLDetector(object):
 
     def pose_cb(self, msg):
         self.pose = msg
+        self.image_cb_substitute()
 
     def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
@@ -73,23 +74,8 @@ class TLDetector(object):
     def traffic_cb(self, msg):
         self.lights = msg.lights
 
-    def image_cb(self, msg):
-        """Identifies red lights in the incoming camera image and publishes the index
-            of the waypoint closest to the red light's stop line to /traffic_waypoint
-
-        Args:
-            msg (Image): image from car-mounted camera
-
-        """
-        self.img_counter += 1
-
-        if self.img_counter < 5:
-            return
-
-        self.img_counter = 0
-
-        self.has_image = True
-        self.camera_image = msg
+    # Will be triggered by pose_cb (same frequency)
+    def image_cb_substitute(self):
         light_wp, state = self.process_traffic_lights()
 
         '''
@@ -114,6 +100,26 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
+
+    # Not used -> Camera data active is very very slow
+    def image_cb(self, msg):
+        """Identifies red lights in the incoming camera image and publishes the index
+            of the waypoint closest to the red light's stop line to /traffic_waypoint
+
+        Args:
+            msg (Image): image from car-mounted camera
+
+        """
+        self.img_counter += 1
+
+        if self.img_counter < 5:
+            return
+
+        self.img_counter = 0
+
+        # self.has_image = True
+        # self.camera_image = msg
+        image_cb_substitute()
 
     def distance2(self, pose1, pose2):
         """Calculate the square of the Eucleadian distance bentween the two poses given
