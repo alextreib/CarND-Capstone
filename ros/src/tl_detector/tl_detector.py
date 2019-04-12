@@ -60,9 +60,7 @@ class TLDetector(object):
 
         rospy.spin()
 
-    def pose_cb(self, msg):
-        self.pose = msg
-        self.image_cb_substitute()
+    
 
     def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
@@ -120,6 +118,10 @@ class TLDetector(object):
         # self.has_image = True
         # self.camera_image = msg
         image_cb_substitute()
+
+    def pose_cb(self, msg):
+        self.pose = msg
+        self.image_cb_substitute()
 
     def distance2(self, pose1, pose2):
         """Calculate the square of the Eucleadian distance bentween the two poses given
