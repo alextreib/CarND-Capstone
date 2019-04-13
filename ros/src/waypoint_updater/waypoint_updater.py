@@ -97,35 +97,31 @@ class WaypointUpdater(object):
 
     def generate_lane(self):
         lane = Lane()
+        self.next_wp_idx = self.get_closest_waypoint()
 
-        closest_idx = self.get_closest_waypoint_id()
-        farthest_idx = closest_idx + LOOKAHEAD_WPS
-        waypoints = self.base_waypoints.waypoints[closest_idx:farthest_idx]
+        waypoints = deepcopy(self.base_waypoints[
+            self.next_wp_idx:self.next_wp_idx+LOOKAHEAD_WPS
+        ])
+        if self.next_stop_line_idx != -1:
+            waypoints = self.decelerate_waypoints(waypoints, self.next_wp_idx)
 
-        if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
-            lane.waypoints = waypoints
-        else:
-            lane.waypoints = self.decelerate_waypoints(waypoints, closest_idx)
-
+        lane.waypoints = waypoints
         return lane
 
-    def decelerate_waypoints(self, waypoints, closest_idx):
-        result = []
-        for i, wp in enumerate(waypoints):
-            new_point = Waypoint()
-            new_point.pose = wp.pose
+    def decelerate_waypoints(self, waypoints, next_wp_idx):
+        last_idx = self.next_stop_line_idx - self.next_wp_idx - 3
+        last = waypoints[last_idx]
+        last.twist.twist.linear.x = 0.
+        for wp in waypoints[:last_idx][::-1]:
+            dist = self.direct_distance(
+                wp.pose.pose.position, last.pose.pose.position)
+            vel = math.sqrt(2 * MAX_DECEL * dist)
+            if vel < 1.:
+                vel = 0.
+            self.set_waypoint_velocity(
+                wp, min(vel, self.get_waypoint_velocity(wp)))
+        return waypoints
 
-            stop_idx = max(self.stopline_wp_idx - closest_idx - 2, 0)  # Two waypints back from line so the front of
-            # the car stops at the line
-            dist = self.distance(waypoints, i, stop_idx)
-            vel = math.sqrt(2 * MAX_DECEL * SAFETY_FACTOR * dist)
-            if vel < 1.0:
-                vel = 0.0
-
-            new_point.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
-            result.append(new_point)
-
-        return result
     def pose_cb(self, msg):
         # Loop is here. Everytime pose is coming in -> new waypoints are published 
         self.pose = msg
