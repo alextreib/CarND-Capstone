@@ -104,7 +104,7 @@ class WaypointUpdater(object):
         ])
 
         if self.next_stop_line_idx != -1:
-            waypoints = self.decelerate_waypoints(waypoints, self.next_stop_line_idx, self.next_wp_idx)
+            waypoints = self.decelerate_waypoints(waypoints, next_stop_line_idx, next_wp_idx)
 
         lane.waypoints = waypoints
         return lane
