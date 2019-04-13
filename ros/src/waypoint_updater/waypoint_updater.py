@@ -64,7 +64,7 @@ class WaypointUpdater(object):
         closest_distance = float('inf')
         closest_wp_idx = 0
         for idx, waypoint in enumerate(self.base_waypoints):
-            distance = self.straight_dist(
+            distance = self.direct_distance(
                 waypoint.pose.pose.position,
                 self.pose.pose.position)
             if distance < closest_distance:
@@ -139,7 +139,7 @@ class WaypointUpdater(object):
         last = waypoints[last_idx]
         last.twist.twist.linear.x = 0.
         for wp in waypoints[:last_idx][::-1]:
-            dist = self.straight_dist(
+            dist = self.direct_distance(
                 wp.pose.pose.position, last.pose.pose.position)
             vel = math.sqrt(2 * MAX_DECEL * dist)
             if vel < 1.:
@@ -169,6 +169,10 @@ class WaypointUpdater(object):
             self.next_stop_line_idx = -1
         else:
             self.next_stop_line_idx = stop_waypoint_idx
+
+
+    def direct_distance(self, pos0, pos1):
+        return math.sqrt((pos0.x - pos1.x) ** 2 + (pos0.y - pos1.y) ** 2)
 
 
     def get_waypoint_velocity(self, waypoint):
