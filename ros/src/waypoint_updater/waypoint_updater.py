@@ -36,7 +36,6 @@ class WaypointUpdater(object):
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb,queue_size=1)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb,queue_size=1)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
-        # rospy.Subscriber('/obstacle_waypoint', Obstacle, self.obstacle_cb)
 
         self.final_waypoints_pub = rospy.Publisher(
             'final_waypoints', Lane, queue_size=1)
@@ -46,17 +45,20 @@ class WaypointUpdater(object):
         self.waypoint_tree = None
         self.base_lane = None
         self.stopline_wp_idx = -1
+        self.base_waypoints = []
+        self.next_wp_idx = -1
+        self.next_stop_line_idx = -1
 
-        self.loop()
+        rospy.spin()
 
-    def loop(self):
-        # Control the publishing frequency (better than rospy.spin())
-        rate = rospy.Rate(50)
-        while not rospy.is_shutdown():
-            # If init
-            if self.pose and self.base_lane:
-                self.publish_waypoints()
-            rate.sleep()
+    # def loop(self):
+    #     # Control the publishing frequency (better than rospy.spin())
+    #     rate = rospy.Rate(50)
+    #     while not rospy.is_shutdown():
+    #         # If init
+    #         if self.pose and self.base_lane:
+    #             self.publish_waypoints()
+    #         rate.sleep()
 
     def get_closest_waypoint(self):
         closest_distance = float('inf')
@@ -98,6 +100,7 @@ class WaypointUpdater(object):
         self.final_waypoints_pub.publish(final_lane)
 
     def generate_lane(self):
+        lane = Lane()
         self.closest_wp_idx = self.get_closest_waypoint()
 
         waypoints = deepcopy(self.base_waypoints[
@@ -108,7 +111,7 @@ class WaypointUpdater(object):
 
 
 
-        lane = Lane()
+        
         lane.waypoints = waypoints
         return lane
 
@@ -147,6 +150,7 @@ class WaypointUpdater(object):
 
     def pose_cb(self, msg):
         self.pose = msg
+        self.publish_waypoints()
 
     def waypoints_cb(self, waypoints):
         self.base_waypoints = waypoints.waypoints
@@ -161,11 +165,11 @@ class WaypointUpdater(object):
 
     def traffic_cb(self, msg):
         self.stopline_wp_idx=msg.data
+        if stop_waypoint_idx == -1:
+            self.next_stop_line_idx = -1
+        else:
+            self.next_stop_line_idx = stop_waypoint_idx
 
-
-    def obstacle_cb(self, msg):
-        # TODO: Callback for /obstacle_waypoint message. We will implement it later
-        pass
 
     def get_waypoint_velocity(self, waypoint):
         return waypoint.twist.twist.linear.x
