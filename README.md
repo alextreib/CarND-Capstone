@@ -119,3 +119,4 @@ The result follows the calculated waypoints, an human acceptable acceleration/de
 
 See the following GIF to see an excerpt of the simulation.
 
+![Alt Text](doc/Result.gif)
