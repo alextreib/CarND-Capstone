@@ -146,7 +146,7 @@ class WaypointUpdater(object):
             vel = math.sqrt(2 * MAX_DECEL * dist)
             if vel < 1.:
                 vel = 0.
-            self.set_waypoint_velocity(
+            self.set_waypoint_velocity(waypoints,
                 wp, min(vel, self.get_waypoint_velocity(wp)))
         return waypoints
 
