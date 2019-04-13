@@ -55,15 +55,6 @@ class WaypointUpdater(object):
 
         rospy.spin()
 
-    # def loop(self):
-    #     # Control the publishing frequency (better than rospy.spin())
-    #     rate = rospy.Rate(50)
-    #     while not rospy.is_shutdown():
-    #         # If init
-    #         if self.pose and self.base_lane:
-    #             self.publish_waypoints()
-    #         rate.sleep()
-
     def get_closest_waypoint(self):
         closest_distance = float('inf')
         next_wp_idx = 0
@@ -116,20 +107,6 @@ class WaypointUpdater(object):
         lane.waypoints = waypoints
         return lane
 
-        # next_wp_idx = self.get_closest_waypoint()
-        # farthest_idx = next_wp_idx + LOOKAHEAD_WPS
-        # base_waypoints = self.base_lane.waypoints[next_wp_idx:farthest_idx]
-
-        # if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
-        #     # Publish directly
-        #     lane.waypoints = base_waypoints
-        # else:
-        #     # Calculate the decelerated waypoints
-        #     lane.waypoints = self.decelerate_waypoints(
-        #         base_waypoints, next_wp_idx)
-
-        # return lane
-
     def decelerate_waypoints(self, waypoints, next_wp_idx):
         last_idx = self.next_stop_line_idx - self.next_wp_idx - 3
         last = waypoints[last_idx]
@@ -150,14 +127,6 @@ class WaypointUpdater(object):
 
     def waypoints_cb(self, waypoints):
         self.base_waypoints = waypoints.waypoints
-
-    # def waypoints_cb(self, waypoints):
-    #     # Base waypoints
-    #     self.base_lane = waypoints
-    #     if not self.waypoints_2d:
-    #         self.waypoints_2d = [
-    #             [w.pose.pose.position.x, w.pose.pose.position.y] for w in waypoints.waypoints]
-    #         self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
         stop_waypoint_idx = msg.data
@@ -184,7 +153,6 @@ class WaypointUpdater(object):
                        waypoints[i].pose.pose.position)
             wp1 = i
         return dist
-
 
 if __name__ == '__main__':
     try:
