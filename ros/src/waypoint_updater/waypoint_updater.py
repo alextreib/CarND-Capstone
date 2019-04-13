@@ -63,27 +63,27 @@ class WaypointUpdater(object):
 
     def get_closest_waypoint(self):
         closest_distance = float('inf')
-        closest_wp_idx = 0
+        next_wp_idx = 0
         for idx, waypoint in enumerate(self.base_waypoints):
             distance = self.direct_distance(
                 waypoint.pose.pose.position,
                 self.pose.pose.position)
             if distance < closest_distance:
-                closest_wp_idx = idx
+                next_wp_idx = idx
                 closest_distance = distance
         curr_yaw = self.get_yaw(self.pose.pose.orientation)
 
-        map_x = self.base_waypoints[closest_wp_idx].pose.pose.position.x
-        map_y = self.base_waypoints[closest_wp_idx].pose.pose.position.y
+        map_x = self.base_waypoints[next_wp_idx].pose.pose.position.x
+        map_y = self.base_waypoints[next_wp_idx].pose.pose.position.y
         heading = math.atan2(
             (map_y - self.pose.pose.position.y),
             (map_x - self.pose.pose.position.x)
         )
 
         if abs(curr_yaw - heading) > math.pi / 4:
-            return closest_wp_idx + 1
+            return next_wp_idx + 1
         else:
-            return closest_wp_idx
+            return next_wp_idx
 
     def get_yaw(self, orientation):
         _, _, yaw = tf.transformations.euler_from_quaternion(
@@ -102,13 +102,13 @@ class WaypointUpdater(object):
 
     def generate_lane(self):
         lane = Lane()
-        self.closest_wp_idx = self.get_closest_waypoint()
+        self.next_wp_idx = self.get_closest_waypoint()
 
         waypoints = deepcopy(self.base_waypoints[
-            self.closest_wp_idx:self.closest_wp_idx+LOOKAHEAD_WPS
+            self.next_wp_idx:self.next_wp_idx+LOOKAHEAD_WPS
         ])
         if self.next_stop_line_idx != -1:
-            waypoints = self.decelerate_waypoints(waypoints,self.closest_wp_idx)
+            waypoints = self.decelerate_waypoints(waypoints,self.next_wp_idx)
 
 
 
@@ -121,9 +121,9 @@ class WaypointUpdater(object):
 
         
 
-        # closest_wp_idx = self.get_closest_waypoint()
-        # farthest_idx = closest_wp_idx + LOOKAHEAD_WPS
-        # base_waypoints = self.base_lane.waypoints[closest_wp_idx:farthest_idx]
+        # next_wp_idx = self.get_closest_waypoint()
+        # farthest_idx = next_wp_idx + LOOKAHEAD_WPS
+        # base_waypoints = self.base_lane.waypoints[next_wp_idx:farthest_idx]
 
         # if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
         #     # Publish directly
@@ -131,11 +131,11 @@ class WaypointUpdater(object):
         # else:
         #     # Calculate the decelerated waypoints
         #     lane.waypoints = self.decelerate_waypoints(
-        #         base_waypoints, closest_wp_idx)
+        #         base_waypoints, next_wp_idx)
 
         # return lane
 
-    def decelerate_waypoints(self, waypoints, closest_wp_idx):
+    def decelerate_waypoints(self, waypoints, next_wp_idx):
         last_idx = self.next_stop_line_idx - self.next_wp_idx - 3
         last = waypoints[last_idx]
         last.twist.twist.linear.x = 0.
