@@ -120,7 +120,10 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        return self.waypoint_tree.query([x, y], 1)[1]
+        if self.waypoint_tree:
+            return self.waypoint_tree.query([x, y], 1)[1]
+        else:
+            return 0
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
