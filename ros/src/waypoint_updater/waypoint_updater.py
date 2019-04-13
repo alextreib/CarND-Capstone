@@ -35,8 +35,10 @@ class WaypointUpdater(object):
     def __init__(self):
         rospy.init_node('waypoint_updater')
 
-        rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb,queue_size=1)
-        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb,queue_size=1)
+        rospy.Subscriber('/current_pose', PoseStamped,
+                         self.pose_cb, queue_size=1)
+        rospy.Subscriber('/base_waypoints', Lane,
+                         self.waypoints_cb, queue_size=1)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
 
         self.final_waypoints_pub = rospy.Publisher(
@@ -109,18 +111,10 @@ class WaypointUpdater(object):
             self.next_wp_idx:self.next_wp_idx+LOOKAHEAD_WPS
         ])
         if self.next_stop_line_idx != -1:
-            waypoints = self.decelerate_waypoints(waypoints,self.next_wp_idx)
+            waypoints = self.decelerate_waypoints(waypoints, self.next_wp_idx)
 
-
-
-        
         lane.waypoints = waypoints
         return lane
-
-
-
-
-        
 
         # next_wp_idx = self.get_closest_waypoint()
         # farthest_idx = next_wp_idx + LOOKAHEAD_WPS
@@ -146,7 +140,7 @@ class WaypointUpdater(object):
             vel = math.sqrt(2 * MAX_DECEL * dist)
             if vel < 1.:
                 vel = 0.
-            self.set_waypoint_velocity(waypoints,
+            self.set_waypoint_velocity(
                 wp, min(vel, self.get_waypoint_velocity(wp)))
         return waypoints
 
@@ -166,22 +160,20 @@ class WaypointUpdater(object):
     #         self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
-        stop_waypoint_idx=msg.data
+        stop_waypoint_idx = msg.data
         if stop_waypoint_idx == -1:
             self.next_stop_line_idx = -1
         else:
             self.next_stop_line_idx = stop_waypoint_idx
 
-
     def direct_distance(self, pos0, pos1):
         return math.sqrt((pos0.x - pos1.x) ** 2 + (pos0.y - pos1.y) ** 2)
-
 
     def get_waypoint_velocity(self, waypoint):
         return waypoint.twist.twist.linear.x
 
-    def set_waypoint_velocity(self, waypoints, waypoint, velocity):
-        waypoints[waypoint].twist.twist.linear.x = velocity
+    def set_waypoint_velocity(self, waypoint, velocity):
+        waypoint.twist.twist.linear.x = velocity
 
     def distance(self, waypoints, wp1, wp2):
         dist = 0
