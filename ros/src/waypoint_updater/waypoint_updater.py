@@ -164,7 +164,7 @@ class WaypointUpdater(object):
     #         self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
-        stopline_wp_idx=msg.data
+        stop_waypoint_idx=msg.data
         if stop_waypoint_idx == -1:
             self.next_stop_line_idx = -1
         else:
