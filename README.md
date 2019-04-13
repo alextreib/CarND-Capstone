@@ -1,3 +1,4 @@
+# Project: Programming a Real Self-Driving Car
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
 Please use **one** of the two installation options, either native **or** docker installation.
@@ -72,3 +73,49 @@ cd CarND-Capstone/ros
 roslaunch launch/site.launch
 ```
 5. Confirm that traffic light detection works on real life images
+
+
+---
+
+Writeup
+---
+
+**Programming a Real Self-Driving Car**
+
+---
+### Project Overview
+
+The following project is realized with ROS, which makes it easy to split the components up into several nodes. On the system architecture overview, the inputs/outputs of the different components are displayed.
+
+![image1](doc/system_overview.png)
+
+In short, the car receives a list of waypoints to follow. Taking the traffic_lights into account, vehicle dynamics, traffic light situation and comfortability for driver, these waypoints are adapted accordingly.
+
+### Traffic Light Detector
+
+Due to the fact that the simulation is slowly to an unacceptable velocity, the traffic light detection is taken from the traffic_lights publisher and not based on image detection.
+
+In this component, it is analyzed whether a traffic light (&&Status Red) is close to the vehicle and it needs to react (stop) to it.
+
+If so, it is published in this node through the "/traffic_waypoint". A publisher, which the waypoint updater listens to.
+
+### Waypoint Updater
+
+In order to find the closest waypoint to the actual position of the car ("/current_pose"), an 2D Euclidean distance is calculated and determines the closest waypoint.
+
+Furthermore, the subsequent trajectory is calculated and updated with publisher "/final_waypoints".
+
+### DBW
+
+After the waypoint_updater send the "/final_waypoints", the waypoint_follower is listening to it and publishes the topic "/twist_cmd". With this as input, the dbw_node sets the brake/steering and throttle of the vehicle. 
+
+To adapt the given twist_cmd to a human acceptable level, PID controllers as well as low pass filters are used.
+
+Within the dbw_node a class Controller and Yaw_Controller are used for controlling the vehicle parameters. For details, please have a look at the twist_controller.py and yaw_controller.
+
+### Result
+
+The result follows the calculated waypoints, an human acceptable acceleration/deceleration is kept and the vehicle stops at the traffic lights.
+
+See the following GIF to see an excerpt of the simulation.
+
