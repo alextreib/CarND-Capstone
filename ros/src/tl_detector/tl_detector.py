@@ -82,11 +82,6 @@ class TLDetector(object):
         of times till we start using it. Otherwise the previous stable state is
         used.
         '''
-        # if(self.log_counter > 10):
-        #     # rospy.logwarn("State {0} \n".format(state))
-        # else:
-        #     self.log_counter += 1
-
         if self.state != state:
             self.state_count = 0
             self.state = state
@@ -108,35 +103,11 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
-        self.img_counter += 1
-
-        if self.img_counter < 5:
-            return
-
-        self.img_counter = 0
-
-        # self.has_image = True
-        # self.camera_image = msg
         image_cb_substitute()
 
     def pose_cb(self, msg):
         self.pose = msg
         self.image_cb_substitute()
-
-    def distance2(self, pose1, pose2):
-        """Calculate the square of the Eucleadian distance bentween the two poses given
-
-        Args:
-            pose1: given Pose
-            pose2: given Pose
-
-        Returns:
-            float: square of the Eucleadian distance bentween the two poses given
-
-        """
-        dist2 = (pose1.position.x-pose2.position.x)**2 + \
-            (pose1.position.y-pose2.position.y)**2
-        return dist2
 
     def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
@@ -148,24 +119,6 @@ class TLDetector(object):
             int: index of the closest waypoint in self.waypoints
 
         """
-        # if self.waypoints is None:
-        #     return None
-
-        # dist_min = sys.maxsize
-        # wp_min = None
-
-        # for wp in range(len(self.waypoints.waypoints)):
-        #     dist = self.distance2(pose, self.waypoints.waypoints[wp].pose.pose)
-
-        #     if dist < dist_min:
-        #         dist_min = dist
-        #         wp_min = wp
-
-        # return wp_min
-        # if self.waypoint_tree:
-        #     closest_idx = self.waypoint_tree.query([x, y], 1)[1]
-        #     return closest_idx
-        # return 0
         return self.waypoint_tree.query([x, y], 1)[1]
 
     def get_light_state(self, light):
@@ -179,14 +132,6 @@ class TLDetector(object):
 
         """
         return light.state
-        # if(not self.has_image):
-        #     self.prev_light_loc = None
-        #     return False
-
-        # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-
-        # # Get classification
-        # return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
