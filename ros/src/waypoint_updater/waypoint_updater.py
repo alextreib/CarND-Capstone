@@ -91,6 +91,7 @@ class WaypointUpdater(object):
         return yaw
 
     def publish_waypoints(self):
+        # First generate the lane and then publish the lane
         final_lane = self.generate_lane()
         self.final_waypoints_pub.publish(final_lane)
 
@@ -122,6 +123,7 @@ class WaypointUpdater(object):
         return waypoints
 
     def pose_cb(self, msg):
+        # Loop is here. Everytime pose is coming in -> new waypoints are published 
         self.pose = msg
         self.publish_waypoints()
 
