@@ -110,7 +110,10 @@ class WaypointUpdater(object):
 
     def decelerate_waypoints(self, waypoints, next_wp_idx):
         last_idx = self.next_stop_line_idx - self.next_wp_idx - 3
-        last = waypoints[last_idx]
+        if last_idx in waypoints:
+            last = waypoints[last_idx]
+        else:
+            return waypoints
         last.twist.twist.linear.x = 0.
         for wp in waypoints[:last_idx][::-1]:
             dist = self.direct_distance(
