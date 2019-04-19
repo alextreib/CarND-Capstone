@@ -67,8 +67,8 @@ class WaypointUpdater(object):
                 closest_distance = distance
         curr_yaw = self.get_yaw(self.pose.pose.orientation)
 
-        rospy.loginfo('len(self.base_waypoints): %s ',len(self.base_waypoints))
-        rospy.loginfo('next_wp_idx: %s ',next_wp_idx)
+        rospy.logwarn('len(self.base_waypoints): %s ',len(self.base_waypoints))
+        rospy.logwarn('next_wp_idx: %s ',next_wp_idx)
 
         map_x = self.base_waypoints[next_wp_idx].pose.pose.position.x
         map_y = self.base_waypoints[next_wp_idx].pose.pose.position.y
