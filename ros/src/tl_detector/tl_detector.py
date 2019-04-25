@@ -157,7 +157,12 @@ class TLDetector(object):
             car_position = self.get_closest_waypoint(
                 self.pose.pose.position.x, self.pose.pose.position.y)
 
-            diff = len(self.waypoints.waypoints)
+            # Test if waypoints already exists
+            try:
+                diff = len(self.waypoints.waypoints)
+            except:
+                return -1, TrafficLight.UNKNOWN
+            
             for i, light in enumerate(self.lights):
                 # Get stop line waypoint index
                 line = stop_line_positions[i]
