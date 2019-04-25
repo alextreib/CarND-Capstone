@@ -46,16 +46,23 @@ class WaypointUpdater(object):
 
         self.pose = None
         self.waypoints_2d = None
-        self.waypoint_tree = None
         self.base_lane = None
         self.stopline_wp_idx = -1
         self.base_waypoints = []
         self.next_wp_idx = -1
         self.next_stop_line_idx = -1
 
-        rospy.spin()
+        self.loop()
+
+    def loop(self):
+        rate = rospy.Rate(50)
+        while not rospy.is_shutdown():
+            if self.pose and self.base_waypoints:
+                self.publish_waypoints()
+            rate.sleep()
 
     def get_closest_waypoint(self):
+        
         closest_distance = float('inf')
         next_wp_idx = 0
         for idx, waypoint in enumerate(self.base_waypoints):
@@ -126,9 +133,7 @@ class WaypointUpdater(object):
         return waypoints
 
     def pose_cb(self, msg):
-        # Loop is here. Everytime pose is coming in -> new waypoints are published 
         self.pose = msg
-        self.publish_waypoints()
 
     def waypoints_cb(self, waypoints):
         self.base_waypoints = waypoints.waypoints
