@@ -62,7 +62,6 @@ class WaypointUpdater(object):
             rate.sleep()
 
     def get_closest_waypoint(self):
-        
         closest_distance = float('inf')
         next_wp_idx = 0
         for idx, waypoint in enumerate(self.base_waypoints):
