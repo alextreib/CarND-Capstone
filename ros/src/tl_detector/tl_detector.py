@@ -58,8 +58,14 @@ class TLDetector(object):
         self.last_wp = -1
         self.state_count = 0
 
-        rospy.spin()
+        self.loop()
 
+    def loop(self):
+        rate = rospy.Rate(50)
+        while not rospy.is_shutdown():
+            if self.pose and self.lights:
+                self.image_cb_substitute()
+            rate.sleep()
     
 
     def waypoints_cb(self, waypoints):
@@ -104,11 +110,11 @@ class TLDetector(object):
             msg (Image): image from car-mounted camera
 
         """
-        image_cb_substitute()
+        # image_cb_substitute()
+        return 
 
     def pose_cb(self, msg):
         self.pose = msg
-        self.image_cb_substitute()
 
     def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
